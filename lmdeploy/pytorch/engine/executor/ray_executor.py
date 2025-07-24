@@ -498,8 +498,9 @@ class RayExecutor(ExecutorBase):
         else:
             [ray.kill(worker) for worker in self.workers]
 
-        ray.util.remove_placement_group(self.placement_group)
-        logger.debug('RayExecutor placement group removed.')
+        if not _envs.ray_external_pg_bundles:
+            ray.util.remove_placement_group(self.placement_group)
+            logger.debug('RayExecutor placement group removed.')
         ray.shutdown()
         logger.debug('Ray shutdown.')
 
@@ -582,12 +583,18 @@ class RayExecutor(ExecutorBase):
         sorted_workers = [item[0] for item in sorted_worker_ip_map]
         return sorted_workers
 
+    def _valid_bundle_id(self, bundle_id: int):
+        """Check if a bundle is valid only when self.use_external_ray=True."""
+        if _envs.ray_external_pg_bundles and bundle_id not in _envs.ray_external_pg_bundles:
+            return False
+        return True
+
     def _init_workers_ray(self, placement_group: PlacementGroup, worker_kwargs: dict):
         """Init worker ray."""
         device_str = get_device_str()
         bundle_indices = []
         for bundle_id, bundle in enumerate(placement_group.bundle_specs):
-            if bundle.get(device_str, 0):
+            if bundle.get(device_str, 0) and self._valid_bundle_id(bundle_id):
                 bundle_indices.append(bundle_id)
         bundle_indices = bundle_indices[:self.world_size]
 
@@ -606,7 +613,7 @@ class RayExecutor(ExecutorBase):
                     runtime_env = _update_runtime_env_nsys(runtime_env)
                 noset_cuda_visible_devices = os.getenv('RAY_EXPERIMENTAL_NOSET_CUDA_VISIBLE_DEVICES')
                 logger.info(f'RAY_EXPERIMENTAL_NOSET_CUDA_VISIBLE_DEVICES={noset_cuda_visible_devices}')
-                num_gpus = 1.0 if noset_cuda_visible_devices is None else 0
+                num_gpus = 0.01 if noset_cuda_visible_devices is None else 0
                 if noset_cuda_visible_devices:
                     visible_devices = os.getenv('CUDA_VISIBLE_DEVICES')
                     logger.info(f'CUDA_VISIBLE_DEVICES={visible_devices}')
