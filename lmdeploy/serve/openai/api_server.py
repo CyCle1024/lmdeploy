@@ -966,6 +966,21 @@ async def wakeup(request: SleepWakeupRequest, raw_request: Request = None):
     else:
         return create_error_response(HTTPStatus.BAD_REQUEST, 'Wakeup is not supported by the current engine.')
 
+@router.post('/stop', dependencies=[Depends(check_api_key)])
+async def stop(raw_request: Request = None):
+    if hasattr(VariableInterface.async_engine.engine, 'stop'):
+        VariableInterface.async_engine.engine.stop()
+        return JSONResponse(content=None)
+    else:
+        return create_error_response(HTTPStatus.BAD_REQUEST, 'Stop is not supported by the current engine.')
+
+@router.post('/start', dependencies=[Depends(check_api_key)])
+async def start(raw_request: Request = None):
+    if hasattr(VariableInterface.async_engine.engine, 'start'):
+        VariableInterface.async_engine.engine.start()
+        return JSONResponse(content=None)
+    else:
+        return create_error_response(HTTPStatus.BAD_REQUEST, 'Start is not supported by the current engine.')
 
 """ PD Disaggregation API Begin """
 

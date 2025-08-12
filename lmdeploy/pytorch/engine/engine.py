@@ -1070,6 +1070,14 @@ class Engine:
         self.executor.stop()
         self.executor.release()
 
+    def start(self):
+        forward_event = CounterEvent()
+        forward_event.set()
+        self.executor.start(forward_event)
+
+    def stop(self):
+        self.executor.stop()
+
     def update_params(self, request: Any):
         """Update params."""
         self.executor.update_params(request)

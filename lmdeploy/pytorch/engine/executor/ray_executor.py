@@ -501,6 +501,18 @@ class RayExecutor(ExecutorBase):
         if not _envs.ray_external_pg_bundles:
             ray.util.remove_placement_group(self.placement_group)
             logger.debug('RayExecutor placement group removed.')
+        else:
+            [ray.kill(worker) for worker in self.workers]
+            for idx, worker in enumerate(self.workers):
+                while True:
+                    try:
+                        ray.get(worker.__ray_ready__.remote(), timeout=0.1)
+                        time.sleep(1)
+                    except ray.exceptions.RayActorError:
+                        logger.info(f'Ray worker {idx} is killed')
+                        break
+                    except ray.exceptions.GetTimeoutError:
+                        logger.info(f'Get ray worker {idx} timeout, wait 1s')
         ray.shutdown()
         logger.debug('Ray shutdown.')
 
