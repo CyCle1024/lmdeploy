@@ -372,7 +372,7 @@ class RayExecutor(ExecutorBase):
 
     def wakeup(self, tags: Optional[List[str]] = None):
         """Wakeup."""
-        if tags is None or "kv_cache" in tags:
+        if tags is None or 'kv_cache' in tags:
             self.update_configs()
         self.collective_rpc('wakeup', (tags, ))
 
