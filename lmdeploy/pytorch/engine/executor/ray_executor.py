@@ -221,6 +221,14 @@ class RayWorkerWrapper(WorkerWrapperBase):
         """Exit actor."""
         ray.actor.exit_actor()
 
+    def get_pid(self):
+        """Get worker pid."""
+        if _envs.ascend_required_ipc_pid \
+                and self.device_type == 'ascend':
+            import torch_npu
+            return torch_npu._C._get_ipc_pid()
+        return os.getpid()
+
 
 class RayExecutor(ExecutorBase):
     """Ray executor."""
@@ -599,3 +607,7 @@ class RayExecutor(ExecutorBase):
         return await asyncio.gather(*jobs)
 
     """ PD Disaggregation API Begin """
+
+    def get_workers_pids(self):
+        """Get all worker pids."""
+        return ray.get([worker.get_pid.remote() for worker in self.workers])

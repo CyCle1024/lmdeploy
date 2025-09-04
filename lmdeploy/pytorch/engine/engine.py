@@ -1300,3 +1300,7 @@ class Engine(EngineBase):
 
     def get_schedule_metrics(self):
         return self.scheduler.schedule_metrics
+
+    def get_workers_pids(self):
+        print(f"Engine: {os.getenv('ASCEND_REQUIRED_IPC_PID')}")
+        return self.executor.get_workers_pids()

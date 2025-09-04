@@ -77,6 +77,8 @@ class MPEngine(EngineBase):
         """Create instance."""
         return MPEngineInstance(self)
 
+    def get_workers_pids(self):
+        return self._collective_rpc('get_workers_pids')
 
 class MPEngineInstance(EngineInstanceBase):
     """MP Engine Instance."""

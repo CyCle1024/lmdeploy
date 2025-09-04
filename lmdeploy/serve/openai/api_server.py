@@ -108,8 +108,13 @@ def get_model_list():
 def available_models():
     """Show available models."""
     model_cards = []
+
+    model_card_extra_kwargs = {}
+    if VariableInterface.async_engine.backend == "pytorch":
+        model_card_extra_kwargs["workers_pids"] = VariableInterface.async_engine.engine.get_workers_pids()
+
     for model_name in get_model_list():
-        model_cards.append(ModelCard(id=model_name, root=model_name, permission=[ModelPermission()]))
+        model_cards.append(ModelCard(id=model_name, root=model_name, permission=[ModelPermission()], **model_card_extra_kwargs))
     return ModelList(data=model_cards)
 
 
