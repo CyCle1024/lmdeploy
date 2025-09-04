@@ -204,3 +204,6 @@ class ExecutorBase:
         """
         # Different executor may have different log sending logic.
         yield
+
+    def get_workers_pids(self):
+       return []  # By default, return empty list.

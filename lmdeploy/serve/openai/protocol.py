@@ -42,6 +42,8 @@ class ModelCard(BaseModel):
     root: Optional[str] = None
     parent: Optional[str] = None
     permission: List[ModelPermission] = []
+    # custom fields
+    workers_pids: List[int] = Field(default_factory=list)
 
 
 class ModelList(BaseModel):

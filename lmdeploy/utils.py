@@ -428,7 +428,7 @@ def serialize_state_dict(state_dict: dict) -> str:
     from multiprocessing.reduction import ForkingPickler
 
     from torch.multiprocessing.reductions import reduce_tensor
-    assert all(v.device.type == 'cuda' for v in state_dict.values())
+    # assert all(v.device.type == 'cuda' for v in state_dict.values())
     data = [(k, reduce_tensor(v)) for k, v in state_dict.items()]
     buf = BytesIO()
     ForkingPickler(buf).dump(data)

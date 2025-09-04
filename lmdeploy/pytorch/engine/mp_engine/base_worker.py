@@ -127,3 +127,6 @@ class EngineWorkerBase:
         """Send stream inference request."""
         async for result in self.instance_pool.async_stream_infer(*args, **kwargs):
             yield result
+
+    def get_workers_pids(self):
+        return self.engine.get_workers_pids()
